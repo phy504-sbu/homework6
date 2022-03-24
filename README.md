@@ -1,6 +1,6 @@
 # Homework #6
 
-### due: Friday March 28, 2022
+### due: Monday March 28, 2022
 
 > Each student is responsible for doing their own work.  You are welcome to
 > discuss this on slack or in class, but when it comes to writing the code,
