@@ -52,7 +52,23 @@ void write_history(const std::vector<OrbitState>& history, const std::string& pr
 
 }
 
-std::vector<OrbitState> integrate(const double a, const double tmax, const double dt) {
+double error(const std::vector<OrbitState>& history) {
+    
+    // compute the error as the change in radius from the start to finish
+
+    double R_initial = std::sqrt(std::pow(history[0].x, 2) + std::pow(history[0].y, 2));
+
+    // we can access the last element as history.back()
+
+    auto last = history.back();
+
+    double R_final = std::sqrt(std::pow(last.x, 2) + std::pow(last.y, 2));
+
+    return std::abs(R_final - R_initial);
+
+}
+
+std::vector<OrbitState> integrate(const double a, const double tmax, const double dt_in) {
 
     // how the history of the orbit
 
@@ -71,8 +87,14 @@ std::vector<OrbitState> integrate(const double a, const double tmax, const doubl
 
     orbit_history.push_back(state);
 
+    double dt = dt_in;
+
     // integration loop
     while (state.t < tmax) {
+
+        if (state.t + dt > tmax) {
+            dt = tmax - state.t;
+        }
 
         // get the derivatives
         auto state_derivs = rhs(state);
@@ -91,7 +113,7 @@ std::vector<OrbitState> integrate(const double a, const double tmax, const doubl
 
 }
 
-std::vector<OrbitState> integrate_rk2(const double a, const double tmax, const double dt) {
+std::vector<OrbitState> integrate_rk2(const double a, const double tmax, const double dt_in) {
 
     // how the history of the orbit
 
@@ -110,8 +132,14 @@ std::vector<OrbitState> integrate_rk2(const double a, const double tmax, const d
 
     orbit_history.push_back(state);
 
+    double dt = dt_in;
+
     // integration loop
     while (state.t < tmax) {
+
+        if (state.t + dt > tmax) {
+            dt = tmax - state.t;
+        }
 
         // get the derivatives
         auto state_derivs = rhs(state);
@@ -151,10 +179,36 @@ int main() {
     double dt = 0.001;
     double a = 1.0;      // 1 AU
 
+    // part a -- output to a file
+
     auto orbit_history_euler = integrate(a, tmax, dt);
     write_history(orbit_history_euler, "euler_");
 
     auto orbit_history_rk2 = integrate_rk2(a, tmax, dt);
     write_history(orbit_history_rk2, "rk2_");    
+
+    // part b -- look at convergence
+
+    std::cout << "Euler convergence: " << std::endl;
+    
+    double dt_conv = 0.01;
+    for (int n = 0; n < 5; ++n) {
+        auto orbit_history_conv = integrate(a, tmax, dt_conv);
+        std::cout << "dt, err = " << dt << " " << error(orbit_history_conv) << std::endl;
+
+        dt_conv /= 2;
+    }
+
+    std::cout << std::endl;
+    
+    std::cout << "RK2 convergence: " << std::endl;
+    
+    dt_conv = 0.01;
+    for (int n = 0; n < 5; ++n) {
+        auto orbit_history_conv = integrate_rk2(a, tmax, dt_conv);
+        std::cout << "dt, err = " << dt << " " << error(orbit_history_conv) << std::endl;
+
+        dt_conv /= 2;
+    }
 
 }
