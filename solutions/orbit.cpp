@@ -194,7 +194,7 @@ int main() {
     double dt_conv = 0.01;
     for (int n = 0; n < 5; ++n) {
         auto orbit_history_conv = integrate(a, tmax, dt_conv);
-        std::cout << "dt, err = " << dt << " " << error(orbit_history_conv) << std::endl;
+        std::cout << "dt, err = " << dt_conv << " " << error(orbit_history_conv) << std::endl;
 
         dt_conv /= 2;
     }
@@ -206,7 +206,7 @@ int main() {
     dt_conv = 0.01;
     for (int n = 0; n < 5; ++n) {
         auto orbit_history_conv = integrate_rk2(a, tmax, dt_conv);
-        std::cout << "dt, err = " << dt << " " << error(orbit_history_conv) << std::endl;
+        std::cout << "dt, err = " << dt_conv << " " << error(orbit_history_conv) << std::endl;
 
         dt_conv /= 2;
     }
